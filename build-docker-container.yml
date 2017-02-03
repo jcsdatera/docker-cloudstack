@@ -2,7 +2,7 @@
 - hosts: localhost
   connection: local
   vars:
-    cloudstack_version: 4.7
+    cloudstack_version: 4.8
     primary_path: /opt/storage/primary
     secondary_path: /opt/storage/secondary
     cloud_user_password: cloudstack
