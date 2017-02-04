@@ -3,7 +3,7 @@
   vars:
     host_key_checking: false
     cloudstack_database_password: cloudstack
-  sudo: true
+  become: true
   tasks:
     - name: setup cloudstack passwordless sudo
       lineinfile: "dest=/etc/sudoers state=present regexp='^%cloudstack' line='%cloudstack ALL=(ALL) NOPASSWD: ALL'"
@@ -19,7 +19,7 @@
       register: cloud_database
     - name: setup cloudstack databases
       shell: /home/cloudstack/setup-database.sh
-      sudo: false
+      become: false
       when: not cloud_database.stdout
     - name: setup cloudstack supervisor file
       template: src=build/cloudstack-supervisor.conf.j2 dest=/etc/supervisor/conf.d/cloudstack.conf
