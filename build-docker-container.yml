@@ -10,39 +10,39 @@
   tasks:
     - name: ensure that primary storage path exists
       file: state=directory path={{ primary_path }}
-      sudo: true
+      become: true
     - name: ensure that secondary storage path exists
       file: state=directory path={{ secondary_path }}
-      sudo: true
+      become: true
 
     - name: ensure that nfs is installed (Debian)
       apt: name=nfs-kernel-server state=latest
       when: ansible_os_family == "Debian"
-      sudo: true
+      become: true
     - name: ensure that nfs is installed (RedHat)
       yum: name={{ item }} state=latest
       with_items:
         - libselinux-python
         - nfs-utils
       when: ansible_os_family == "RedHat"
-      sudo: true
+      become: true
     - name: ensure that nfs is installed (Suse)
       zypper: name={{ item }} state=latest
       with_items:
         - nfs-kernel-server
         - nfs-utils
       when: ansible_os_family == "Suse"
-      sudo: true
+      become: true
     - name: ensure that nfs is installed (Arch)
       pacman: name=nfs-utils state=present
       when: ansible_os_family == "Archlinux"
-      sudo: true
+      become: true
     - name: ensure that nfs is installed (Gentoo)
       portage: name={{ item }} state=present
       with_items:
         - net-fs/nfs-utils
       when: ansible_os_family == "Gentoo"
-      sudo: true
+      become: true
 
     - name: install docker (Debian) (1/3)
       apt: name=apt-transport-https state=latest
@@ -50,31 +50,31 @@
     - name: install docker (Debian) (2/3)
       apt_repository: repo='deb https://get.docker.io/ubuntu docker main' state=present
       when: ansible_os_family == "Debian"
-      sudo: true
+      become: true
     - name: install docker (Debian) (3/3)
       apt: name=lxc-docker state=latest update_cache=true force=yes
       when: ansible_os_family == "Debian"
-      sudo: true
+      become: true
     - name: install docker (RedHat) (1/2)
       yum: name=http://mirror.pnl.gov/epel/6/x86_64/epel-release-6-8.noarch.rpm state=present
       when: ansible_os_family == "RedHat"
-      sudo: true
+      become: true
     - name: install docker (RedHat) (2/2)
       yum: name=docker-io state=present
       when: ansible_os_family == "RedHat"
-      sudo: true
+      become: true
     - name: install docker (Suse) (1/2)
       zypper_repository: repo=http://download.opensuse.org/repositories/Virtualization/openSUSE_13.1/ name=Virtualization state=present
       when: ansible_os_family == "Suse"
-      sudo: true
+      become: true
     - name: install docker (Suse) (2/2)
       zypper: name=docker state=latest
       when: ansible_os_family == "Suse"
-      sudo: true
+      become: true
     - name: install docker (Arch)
       pacman: name=docker state=present
       when: ansible_os_family == "Archlinux"
-      sudo: true
+      become: true
     - name: install docker (Gentoo) (1/2)
       lineinfile: "dest=/etc/portage/package.accept_keywords state=present regexp='app-emulation/docker' line='app-emulation/docker ~amd64'"
       when: ansible_os_family == "Gentoo"
@@ -87,40 +87,40 @@
 
     - name: ensure that primary storage is in /etc/exports
       lineinfile: "dest=/etc/exports state=present regexp='{{ primary_path }}' line='{{ primary_path }} *(rw,no_root_squash,no_subtree_check)'"
-      sudo: true
+      become: true
     - name: ensure that primary storage is in /etc/exports
       lineinfile: "dest=/etc/exports state=present regexp='{{ secondary_path }}' line='{{ secondary_path }} *(rw,no_root_squash,no_subtree_check)'"
-      sudo: true
+      become: true
 
     - name: restart NFS (Debian)
       service: name=nfs-kernel-server state=restarted enabled=yes
       when: ansible_os_family == "Debian"
-      sudo: true
+      become: true
     - name: restart NFS (RedHat)
       service: name={{ item }} state=restarted enabled=yes
       with_items:
         - rpcbind
         - nfs
       when: ansible_os_family == "RedHat"
-      sudo: true
+      become: true
     - name: restart NFS (Suse)
       service: name={{ item }} state=restarted enabled=yes
       with_items:
         - rpcbind
         - nfsserver
       when: ansible_os_family == "Suse"
-      sudo: true
+      become: true
     - name: restart NFS (Arch)
       service: name=nfs-server state=restarted enabled=yes
       when: ansible_os_family == "Archlinux"
-      sudo: true
+      become: true
     - name: restart NFS (Gentoo)
       service: name=nfs state=restarted enabled=yes
-      sudo: true
+      become: true
       when: ansible_os_family == "Gentoo"
 
     - name: ensure that docker-py is installed
-      sudo: True
+      become: True
       pip: name=docker-py state=present
     - name: create new dockerfile for container
       template: src=build/Dockerfile.j2 dest=./Dockerfile
