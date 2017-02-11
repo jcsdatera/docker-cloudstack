@@ -127,9 +127,8 @@
     - name: build cloudstack docker container
       docker_image: name=cloudstack tag={{ cloudstack_version }} path=.
     - name: start cloudstack docker container
-      docker: 
-        ports=8080:8080,8250:8250,3922:3922,9090:9090,7080:7080
-        publish_all_ports=True
-        name=cloudstack
+      docker_container: 
+        published_ports=8080:8080,8250:8250,3922:3922,9090:9090,7080:7080
+        name=cloudstack:{{ cloudstack_version }}
         image=cloudstack:{{ cloudstack_version }}
         volumes={{ secondary_path }}:/opt/storage/secondary,/var/lib/mysql

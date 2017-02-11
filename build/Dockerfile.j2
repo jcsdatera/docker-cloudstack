@@ -26,21 +26,18 @@ RUN sudo -u cloudstack /home/cloudstack/build-cloudstack.sh
 
 # settings for supervisord
 RUN apt-get install -y openssh-server mysql-server supervisor net-tools
-RUN mkdir /var/run/sshd/
-RUN mkdir -p /var/log/supervisor/
-RUN mkdir -p /etc/supervisor/conf.d/
-ADD build/supervisord.conf /etc/supervisor/conf.d/
+RUN mkdir -p /var/run/sshd/ /var/log/supervisor/ /etc/supervisor/conf.d/
+COPY build/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # mysql configuration
-ADD build/my.cnf /etc/mysql/
+COPY build/my.cnf /etc/mysql/my.cnf
 RUN (/usr/bin/mysqld_safe &); sleep 5; echo "DELETE FROM mysql.user WHERE host='::1';SET PASSWORD FOR root@localhost = PASSWORD('{{ mysql_root_password }}'); GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '{{ mysql_root_password }}' WITH GRANT OPTION; FLUSH PRIVILEGES;" | mysql -uroot
 
 # Add Supervisord web interface for log files.
-ADD build/supervisor-interface.conf /etc/supervisor/conf.d/
+COPY build/supervisor-interface.conf /etc/supervisor/conf.d/supervisor-interface.conf
 
 # create directories for storage
-RUN mkdir -p /opt/storage/primary
-RUN mkdir -p /opt/storage/secondary
+RUN mkdir -p /opt/storage/primary /opt/storage/secondary
 
 # port expose
 EXPOSE 22
@@ -49,4 +46,4 @@ EXPOSE 8080 8250 3922 9090 7080
 EXPOSE 9001
 
 # CMD execution
-CMD "/usr/bin/supervisord"
+CMD ["/usr/bin/supervisord"]
